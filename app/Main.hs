@@ -15,8 +15,8 @@ outputGame res = do
 main :: IO ()
 main = do
   let game = Game skurtzTeam butlerTeam 
-  let gameResults = play game
-  outputGame gameResults
+  gameResults <- play game
+  putStrLn $ show gameResults
 
 skurtzTeam = Team
   { teamName = "Skurtz"
