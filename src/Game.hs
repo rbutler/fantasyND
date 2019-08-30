@@ -38,6 +38,11 @@ data Point = Point
 data Action = Score | Block
   deriving (Show, Enum, Bounded)
 
+data GameState = GameState
+  { points :: [Point]
+  , teamInPossession :: Team
+  }
+
 
 removePlayer _ [] = []
 removePlayer player (p:ps) | player == p = removePlayer player ps
