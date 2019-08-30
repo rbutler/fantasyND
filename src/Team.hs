@@ -6,5 +6,6 @@ import Player
 data Team = Team 
   { teamName :: String
   , players :: [Player]
-  , score :: Maybe Int
+  , teamScore :: Maybe Int
   }
+  deriving (Eq)
