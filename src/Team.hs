@@ -9,3 +9,6 @@ data Team = Team
   , teamScore :: Maybe Int
   }
   deriving (Eq)
+
+instance Show Team where
+  show = teamName

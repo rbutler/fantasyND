@@ -22,6 +22,18 @@ data Game = Game
   , points :: [Point]
   }
 
+instance Show Game where
+  show g = do
+    (show $ points g) ++ "\n\nTeam: " ++ (teamName $ winner g) ++ " beat " ++ (teamName $ loser g) ++ " with a score of " ++ (show $ winningScore g) ++ " - " ++ (show $ losingScore g)
+
+winningTeam :: Game -> Int -> Maybe Team
+winningTeam g s
+  | homeTeamScore g == awayTeamScore g = Nothing
+  | homeTeamScore g > awayTeamScore g && homeTeamScore g >= s = Just $ homeTeam g
+  | awayTeamScore g > homeTeamScore g && awayTeamScore g >= s = Just $ awayTeam g
+  | otherwise = Nothing
+
+
 winner :: Game -> Team
 winner g
   | homeTeamScore g > awayTeamScore g = homeTeam g
@@ -32,10 +44,15 @@ loser g
   | awayTeamScore g >= homeTeamScore g = homeTeam g
   | otherwise = awayTeam g
 
-otherTeam :: Game -> Team
-otherTeam g
-  | (teamInPossession g) == (homeTeam g) = homeTeam g
-  | otherwise = awayTeam g
+otherTeam :: Game -> Team -> Team
+otherTeam g t
+  | homeTeam g == t = awayTeam g
+  | otherwise = homeTeam g
+
+teamNotInPossession :: Game -> Team
+teamNotInPossession g
+  | (teamInPossession g) == (homeTeam g) = awayTeam g
+  | otherwise = homeTeam g
 
 winningScore :: Game -> Int
 winningScore g
@@ -65,11 +82,8 @@ data Point = Point
   , homeTeamPoints :: Int
   , awayTeamPoints :: Int
   }
+  deriving (Show, Eq)
 
-
-instance Show Game where
-  show g = do
-    "Team: " ++ (teamName $ winner g) ++ " beat " ++ (teamName $ loser g) ++ " with a score of " ++ (show $ winningScore g) ++ " - " ++ (show $ losingScore g)
 
 
 removePlayer _ [] = []
@@ -83,11 +97,12 @@ randomPlayer ps = do
   return $ ps !! (head (randomRs (0,(length ps) - 1) g))
 
 
-playPoint game = do
+playPoint :: IO Game -> IO Game
+playPoint ioGame = do
+  game <- ioGame
   turnover  <- randomIO :: IO Bool
-  putStrLn $ show turnover
   let scoring = if turnover == True
-                then otherTeam game
+                then teamNotInPossession game
                 else teamInPossession game
   let homeTeamPts = if scoring == (homeTeam game)
                       then (homeTeamScore game) + 1
@@ -112,7 +127,7 @@ playPoint game = do
                 , awayTeam = awayTeam game
                 , homeTeamScore = homeTeamPts
                 , awayTeamScore = awayTeamPts
-                , teamInPossession = otherTeam game
+                , teamInPossession = teamNotInPossession game
                 , points = (points game) ++ [newPoint]
   }
 
@@ -126,10 +141,17 @@ playPoint game = do
 -- TODO - generate random points - this should be a game generator
 play :: Game -> IO (Game)
 play game = do
-  g <- playPoint game
-  g1 <- playPoint g
+  games <- (sequence (take 30 (iterate playPoint $ return game)))
+  let playedGames = untilWinner 15 games
   --p <- randomPlayer $ team1 game
-  return g1
-
+  return $ last playedGames
+  where
+    untilWinner :: Int -> [Game] -> [Game]
+    untilWinner _ [] = []
+    untilWinner s (x:xs) = do
+      if winningTeam x s == Nothing
+      then x : (untilWinner s xs)
+      else [x]
+      
   --, points = randomPoints team1 team2
 
