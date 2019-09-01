@@ -5,28 +5,22 @@ import Player
 import Team
 import Game
 
-outputGame :: GameResults -> IO ()
-outputGame res = do
-  let w = winner res
-  let l = loser res
-  let str = "Team: " ++ (teamName w) ++ " beat " ++ (teamName l) ++ " with a score of " ++ (show $ winningScore res) ++ " - " ++ (show $ losingScore res)
-  putStrLn str
-
 main :: IO ()
 main = do
-  let game = Game skurtzTeam butlerTeam 
-  let gameResults = play game
-  outputGame gameResults
+  let game = Game skurtzTeam butlerTeam 0 0 skurtzTeam []
+  endGame <- play game
+  putStrLn $ show endGame
 
 skurtzTeam = Team
   { teamName = "Skurtz"
   , players = skurtzPlayers
-  , score = Nothing
+  , teamScore = Nothing
   }
+
 butlerTeam = Team
   { teamName = "Butler"
   , players = butlerPlayers
-  , score = Nothing
+  , teamScore = Nothing
   }
 
 butlerPlayers :: [Player]

@@ -17,3 +17,4 @@ data Player = Player
   , excuse :: String
   , chanceToMiss :: Float
   }
+  deriving (Show, Eq)
