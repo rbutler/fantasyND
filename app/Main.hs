@@ -1,14 +1,25 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Main where
+
+import Control.Applicative
+import Data.Monoid
+import System.Environment
+import Web.Twitter.Conduit hiding (map)
 
 import Lib
 import Player
 import Team
 import Game
+import Tweet
 
 main :: IO ()
 main = do
+  twInfo <- getTWInfoFromEnv
+  mgr <- newManager tlsManagerSettings
   let game = Game skurtzTeam butlerTeam 0 0 skurtzTeam []
   endGame <- play game
+  res <- sendTweet twInfo mgr $ finalGameStr endGame
+  print res
   putStrLn $ show endGame
 
 skurtzTeam = Team

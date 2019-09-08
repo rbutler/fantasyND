@@ -24,6 +24,10 @@ dependencies:
 - random
 - transformers
 - twitter-conduit
+- bytestring
+- http-conduit
+- text
+
 
 library:
   source-dirs: src

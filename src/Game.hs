@@ -25,7 +25,11 @@ data Game = Game
 
 instance Show Game where
   show g = do
-    (show $ points g) ++ "\n\nTeam: " ++ (teamName $ winner g) ++ " beat " ++ (teamName $ loser g) ++ " with a score of " ++ (show $ winningScore g) ++ " - " ++ (show $ losingScore g) ++ "\n"
+    (show $ points g) ++ "\n\n" ++ finalGameStr g
+
+finalGameStr g = "Team: " ++ (teamName $ winner g) ++ " beat " ++ (teamName $ loser g) ++ " with a score of " ++ (show $ winningScore g) ++ " - " ++ (show $ losingScore g) ++ "\n"
+  
+  
 
 winningTeam :: Game -> Int -> Maybe Team
 winningTeam g s
